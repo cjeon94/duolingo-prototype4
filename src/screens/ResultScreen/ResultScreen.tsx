@@ -52,6 +52,9 @@ export default function ResultScreen(): JSX.Element {
   const [showOverlay, setShowOverlay] = React.useState(false);
   const [showSecondBubble, setShowSecondBubble] = React.useState(false);
   const [showReviewModal, setShowReviewModal] = React.useState(false);
+  const [showReviewSettings, setShowReviewSettings] = React.useState(false);
+  const [activeTab, setActiveTab] = React.useState<'cadence' | 'flashcards'>('cadence');
+  const [selectedCadence, setSelectedCadence] = React.useState('recommended');
 
   const duoCharacters = [
     "/Duo Character 1.svg",
@@ -126,6 +129,28 @@ export default function ResultScreen(): JSX.Element {
 
   const handleCloseReviewModal = () => {
     setShowReviewModal(false);
+    setShowReviewSettings(false);
+    setActiveTab('cadence');
+    setSelectedCadence('recommended');
+  };
+
+  const handleViewReviewSettings = () => {
+    setShowReviewSettings(true);
+  };
+
+  const handleSaveReviewSettings = () => {
+    console.log('Saved review cadence:', selectedCadence);
+    setShowReviewModal(false);
+    setShowReviewSettings(false);
+    setActiveTab('cadence');
+    setSelectedCadence('recommended');
+    navigate("/lesson/translate");
+  };
+
+  const handleCancelReviewSettings = () => {
+    setShowReviewSettings(false);
+    setActiveTab('cadence');
+    setSelectedCadence('recommended');
   };
 
   // For correct answers, show simple success state
@@ -238,52 +263,179 @@ export default function ResultScreen(): JSX.Element {
         {/* Review Modal */}
         {showReviewModal && (
           <div className="absolute inset-0 bg-[#000000b2] z-[70] flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full mx-4 relative">
+            <div className="bg-white rounded-2xl shadow-xl w-full mx-4 relative" style={{ maxWidth: showReviewSettings ? '380px' : '320px' }}>
               {/* Close Button */}
               <button
                 onClick={handleCloseReviewModal}
-                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors z-10"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              {/* Duo Character */}
-              <div className="flex justify-center mb-4">
-                <img
-                  className="w-24 h-24 object-contain"
-                  alt="Duo character"
-                  src={randomDuoCharacter}
-                />
-              </div>
+              {!showReviewSettings ? (
+                <div className="p-6">
+                  {/* Duo Character */}
+                  <div className="flex justify-center mb-4">
+                    <img
+                      className="w-24 h-24 object-contain"
+                      alt="Duo character"
+                      src={randomDuoCharacter}
+                    />
+                  </div>
 
-              {/* Modal Content */}
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-bold text-[#4b4b4b] mb-3">
-                  Review Schedule
-                </h2>
-                <p className="text-[#4b4b4b] text-base leading-6">
-                  I'll remind you to review "Querida" in 2 days to help strengthen your memory!
-                </p>
-              </div>
+                  {/* Modal Content */}
+                  <div className="text-center mb-6">
+                    <h2 className="text-xl font-bold text-[#4b4b4b] mb-3">
+                      Review Schedule
+                    </h2>
+                    <p className="text-[#4b4b4b] text-base leading-6">
+                      I'll remind you to review "Querida" in 2 days to help strengthen your memory!
+                    </p>
+                  </div>
 
-              {/* Action Buttons */}
-              <div className="space-y-3">
-                <button
-                  onClick={handleCloseReviewModal}
-                  className="w-full h-12 rounded-xl text-white font-semibold bg-[#58cc02] shadow-[0_3px_0_#48a502] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[#4fb802]"
-                >
-                  Got it!
-                </button>
-                <button
-                  onClick={() => {
-                    setShowReviewModal(false);
-                    navigate("/review/cadence?preset=2d");
-                  }}
-                  className="w-full h-12 rounded-xl border-2 border-gray-300 bg-white shadow-[0_3px_0_#d1d5db] text-gray-600 font-semibold active:translate-y-[2px] active:shadow-none transition-all hover:bg-gray-50"
-                >
-                  View Review Settings
-                </button>
-              </div>
+                  {/* Action Buttons */}
+                  <div className="space-y-3">
+                    <button
+                      onClick={handleCloseReviewModal}
+                      className="w-full h-12 rounded-xl text-white font-semibold bg-[#58cc02] shadow-[0_3px_0_#48a502] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[#4fb802]"
+                    >
+                      Got it!
+                    </button>
+                    <button
+                      onClick={handleViewReviewSettings}
+                      className="w-full h-12 rounded-xl border-2 border-gray-300 bg-white shadow-[0_3px_0_#d1d5db] text-gray-600 font-semibold active:translate-y-[2px] active:shadow-none transition-all hover:bg-gray-50"
+                    >
+                      View Review Settings
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-6">
+                  {/* Learning Review Settings */}
+                  <div className="mb-6">
+                    <h2 className="text-xl font-bold text-[#4b4b4b] mb-4">
+                      Learning Review
+                    </h2>
+                    
+                    {/* Tabs */}
+                    <div className="flex border-b border-gray-200 mb-6">
+                      <button
+                        onClick={() => setActiveTab('cadence')}
+                        className={`flex-1 py-3 text-sm font-semibold border-b-2 transition-colors ${
+                          activeTab === 'cadence'
+                            ? 'border-[#1cb0f6] text-[#1cb0f6]'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                        }`}
+                      >
+                        Review Cadence
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('flashcards')}
+                        className={`flex-1 py-3 text-sm font-semibold border-b-2 transition-colors ${
+                          activeTab === 'flashcards'
+                            ? 'border-[#1cb0f6] text-[#1cb0f6]'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                        }`}
+                      >
+                        Flashcards
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Tab Content */}
+                  {activeTab === 'cadence' ? (
+                    <div className="mb-6">
+                      {/* Main Options */}
+                      <div className="space-y-3 mb-6">
+                        {[
+                          { id: 'recommended', label: 'Review as recommended', highlighted: true },
+                          { id: 'tomorrow', label: 'Review tomorrow', highlighted: false },
+                          { id: 'no-review', label: 'No review for now', highlighted: false },
+                          { id: 'no-more', label: 'No more reviews', highlighted: false },
+                        ].map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => setSelectedCadence(option.id)}
+                            className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                              selectedCadence === option.id
+                                ? option.highlighted
+                                  ? 'border-[#1cb0f6] bg-[#e6f3ff] text-[#1cb0f6]'
+                                  : 'border-[#1cb0f6] bg-[#f0f9ff] text-[#1cb0f6]'
+                                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium">{option.label}</span>
+                              {selectedCadence === option.id && (
+                                <div className="w-5 h-5 bg-[#1cb0f6] rounded-full flex items-center justify-center">
+                                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Divider */}
+                      <div className="flex items-center mb-4">
+                        <div className="flex-1 h-px bg-gray-200"></div>
+                        <span className="px-3 text-sm text-gray-500 font-medium">Other options</span>
+                        <div className="flex-1 h-px bg-gray-200"></div>
+                      </div>
+
+                      {/* Other Options */}
+                      <div className="space-y-3">
+                        {[
+                          { id: 'next-week', label: 'Review next week' },
+                          { id: 'two-weeks', label: 'Review in 2 weeks' },
+                        ].map((option) => (
+                          <button
+                            key={option.id}
+                            onClick={() => setSelectedCadence(option.id)}
+                            className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                              selectedCadence === option.id
+                                ? 'border-[#1cb0f6] bg-[#f0f9ff] text-[#1cb0f6]'
+                                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium">{option.label}</span>
+                              {selectedCadence === option.id && (
+                                <div className="w-5 h-5 bg-[#1cb0f6] rounded-full flex items-center justify-center">
+                                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mb-6">
+                      <div className="text-center py-12">
+                        <div className="text-gray-400 text-lg mb-2">📚</div>
+                        <p className="text-gray-500">Flashcard settings coming soon!</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleCancelReviewSettings}
+                      className="flex-1 h-12 rounded-xl border-2 border-gray-300 bg-white shadow-[0_3px_0_#d1d5db] text-gray-600 font-semibold active:translate-y-[2px] active:shadow-none transition-all hover:bg-gray-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveReviewSettings}
+                      className="flex-1 h-12 rounded-xl text-white font-semibold bg-[#58cc02] shadow-[0_3px_0_#48a502] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[#4fb802]"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
