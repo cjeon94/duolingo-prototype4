@@ -51,6 +51,7 @@ export default function ResultScreen(): JSX.Element {
   const [isPillPulsing, setIsPillPulsing] = React.useState(false);
   const [showOverlay, setShowOverlay] = React.useState(false);
   const [showSecondBubble, setShowSecondBubble] = React.useState(false);
+  const [showReviewModal, setShowReviewModal] = React.useState(false);
 
   const duoCharacters = [
     "/Duo Character 1.svg",
@@ -106,7 +107,11 @@ export default function ResultScreen(): JSX.Element {
   };
 
   const handleReviewClick = () => {
-    navigate("/review/cadence?preset=2d");
+    if (firstReview && showSecondBubble) {
+      setShowReviewModal(true);
+    } else {
+      navigate("/review/cadence?preset=2d");
+    }
   };
 
   const handleCopy = () => {
@@ -117,6 +122,10 @@ export default function ResultScreen(): JSX.Element {
 
   const handleShare = () => {
     console.log("Share clicked");
+  };
+
+  const handleCloseReviewModal = () => {
+    setShowReviewModal(false);
   };
 
   // For correct answers, show simple success state
@@ -225,6 +234,59 @@ export default function ResultScreen(): JSX.Element {
         >
           Review in 2 days
         </button>
+
+        {/* Review Modal */}
+        {showReviewModal && (
+          <div className="absolute inset-0 bg-[#000000b2] z-60 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full mx-4 relative">
+              {/* Close Button */}
+              <button
+                onClick={handleCloseReviewModal}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Duo Character */}
+              <div className="flex justify-center mb-4">
+                <img
+                  className="w-24 h-24 object-contain"
+                  alt="Duo character"
+                  src={randomDuoCharacter}
+                />
+              </div>
+
+              {/* Modal Content */}
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-bold text-[#4b4b4b] mb-3">
+                  Review Schedule
+                </h2>
+                <p className="text-[#4b4b4b] text-base leading-6">
+                  I'll remind you to review "Querida" in 2 days to help strengthen your memory!
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <button
+                  onClick={handleCloseReviewModal}
+                  className="w-full h-12 rounded-xl text-white font-semibold bg-[#58cc02] shadow-[0_3px_0_#48a502] active:translate-y-[2px] active:shadow-none transition-all hover:bg-[#4fb802]"
+                >
+                  Got it!
+                </button>
+                <button
+                  onClick={() => {
+                    setShowReviewModal(false);
+                    navigate("/review/cadence?preset=2d");
+                  }}
+                  className="w-full h-12 rounded-xl border-2 border-gray-300 bg-white shadow-[0_3px_0_#d1d5db] text-gray-600 font-semibold active:translate-y-[2px] active:shadow-none transition-all hover:bg-gray-50"
+                >
+                  View Review Settings
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Dark Overlay - Similar to first screens */}
         {showOverlay && (
