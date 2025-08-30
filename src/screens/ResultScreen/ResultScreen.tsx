@@ -237,7 +237,7 @@ export default function ResultScreen(): JSX.Element {
 
         {/* Review Modal */}
         {showReviewModal && (
-          <div className="absolute inset-0 bg-[#000000b2] z-60 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-[#000000b2] z-[70] flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl p-6 shadow-xl max-w-sm w-full mx-4 relative">
               {/* Close Button */}
               <button
